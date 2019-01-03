@@ -34,7 +34,6 @@ definitions:
       - loginSuccess
       - loginFailure
       - logout
-      - orgCreate
       - permission-grantCreate
       - permission-grantUpdate
       - pluginCreate
@@ -112,6 +111,11 @@ paths:
           required: true
           description: |
             The dateRange for the query.
+        - name: userId
+          in: query
+          type: integer
+          description: |
+            User who has taken the queried actions
 
       tags:
         - audit
