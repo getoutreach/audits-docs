@@ -93,7 +93,7 @@ definitions:
             example: 2019-01-01:00:00:00
 
 paths:
-  /api/v1/audits/:
+  /api/v2/audits/:
     get:
       summary: List of audit events
       description: Filtered list of audit events for a specific org
@@ -123,7 +123,7 @@ paths:
             items:
               $ref: "#/definitions/audit"
 
-  /api/v1/audits/events:
+  /api/v2/audits/events:
     get:
       summary: List of event definitions
       tags:
@@ -136,21 +136,3 @@ paths:
             items:
               $ref: "#/definitions/event"
             description: Description of the types of audit events.
-
-  /healthz/:
-    get:
-      summary: Health check
-      description: Health check to make sure the service responds and Elasticsearch is up
-      tags:
-        - health
-      responses:
-        200:
-          description: OK
-          schema:
-            type: object
-        500:
-          description: health check has failed
-          schema:
-            $ref: "#/definitions/errors"
-
-
