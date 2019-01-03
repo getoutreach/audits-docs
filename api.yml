@@ -1,0 +1,156 @@
+swagger: "2.0"
+info:
+  version: 2.0.0
+  title: Audits
+  description: Audit logs query interface
+
+tags: 
+  - name: audit
+    description: audit search
+  - name: health
+    description: healthcheck
+consumes:
+  - application/vnd.api+json
+produces:
+  - application/vnd.api+json
+
+definitions:
+  errors:
+    type: object
+    properties:
+      errors:
+        type: array
+        items:
+          type: object
+        example:
+          - Audit type 
+        description: List of errors
+
+  event-type:
+    type: string
+    enum: &EVENT_TYPES
+      - authCreate
+      - authUpdate
+      - loginSuccess
+      - loginFailure
+      - logout
+      - orgCreate
+      - permission-grantCreate
+      - permission-grantUpdate
+      - pluginCreate
+      - pluginDestroy
+      - pluginUpdate
+      - pluginFieldCreate
+      - pluginFieldDestroy
+      - pluginFieldUpdate
+      - pluginTypeCreate
+      - pluginTypeDestroy
+      - pluginTypeUpdate
+    description: Type of the event
+
+  audit:
+    type: object
+    properties:
+      event-type:
+        type: string
+        enum: *EVENT_TYPES
+    example:
+      event-type: loginFailure
+      user-id: 12
+      error-message: Invalid password
+      timestamp: 2019-01-01:00:00:00
+
+  event:
+    type: object
+    properties:
+      event-type:
+        type: string
+        enum: *EVENT_TYPES
+        example: loginFailure
+      fields:
+        type: array
+        items:
+          type: object
+          properties:
+            name:
+              type: string
+              description: name of the field
+            type:
+              type: string
+              description: type of field
+            example:
+              type: string
+              description: example of value
+        example:
+          - name: userId
+            type: integer
+            example: 12
+          - name: errorMessage
+            type: string
+            example: "Invalid password"
+          - name: timestamp
+            type: string
+            example: 2019-01-01:00:00:00
+
+paths:
+  /api/v1/audits/:
+    get:
+      summary: List of audit events
+      description: Filtered list of audit events for a specific org
+      parameters:
+        - in: query
+          name: eventType
+          type: string
+          enum: *EVENT_TYPES
+          required: true
+          description: |
+            Type of event by which to filter.
+        - name: dateRange
+          in: query
+          type: string
+          format: date
+          required: true
+          description: |
+            The dateRange for the query.
+
+      tags:
+        - audit
+      responses:
+        200:
+          description: OK
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/audit"
+
+  /api/v1/audits/events:
+    get:
+      summary: List of event definitions
+      tags:
+        - audit
+      responses:
+        200:
+          description: OK
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/event"
+            description: Description of the types of audit events.
+
+  /healthz/:
+    get:
+      summary: Health check
+      description: Health check to make sure the service responds and Elasticsearch is up
+      tags:
+        - health
+      responses:
+        200:
+          description: OK
+          schema:
+            type: object
+        500:
+          description: health check has failed
+          schema:
+            $ref: "#/definitions/errors"
+
+
